@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گجت امنیتی | امنیت را لمس کنید</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.net.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        :root {
+            --primary: #00e676;
+            --primary-dark: #00c853;
+            --secondary: #1e1e1e;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --text: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --accent: #4caf50;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        #vanta-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: rgba(28, 37, 38, 0.9);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        .nav-links li a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            font-weight: 500;
+            position: relative;
+            padding: 8px 0;
+        }
+
+        .nav-links li a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links li a:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background-color: var(--text);
+            margin: 5px;
+            transition: var(--transition);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding: 0 20px;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 40px;
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 1s ease-out;
+            border: 1px solid rgba(0, 230, 118, 0.2);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            line-height: 1.2;
+            text-shadow: 0 0 20px rgba(0, 230, 118, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 40px;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--background);
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            position: relative;
+            z-index: 2;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 230, 118, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 230, 118, 0.6);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            z-index: -1;
+            transition: var(--transition);
+            opacity: 0;
+        }
+
+        .btn:hover::after {
+            opacity: 1;
+        }
+
+        /* Products Section */
+        .section {
+            padding: 100px 20px;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 2.8rem;
+            margin-bottom: 60px;
+            color: var(--primary);
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .product-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 15px 30px rgba(0, 230, 118, 0.3);
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition);
+        }
+
+        .product-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .image-container {
+            width: 100%;
+            height: 220px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .image-container img {
+            transform: scale(1.1);
+        }
+
+        .product-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .product-card p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            min-height: 60px;
+        }
+
+        .rating {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .rating i {
+            color: gold;
+            font-size: 1.1rem;
+        }
+
+        /* About Section */
+        .about-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .about-text {
+            text-align: center;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            max-width: 800px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 230, 118, 0.2);
+        }
+
+        .feature-card i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .feature-card h4 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        /* Contact Section */
+        .contact-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 50px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .contact-item i {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 230, 118, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+
+        .contact-item div h4 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .contact-item div p {
+            color: var(--text-secondary);
+        }
+
+        .contact-form {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.2);
+        }
+
+        .form-group textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(28, 37, 38, 0.9);
+            padding: 50px 20px 20px;
+            text-align: center;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            text-align: right;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-links li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links li a:hover {
+            color: var(--primary);
+            transform: translateX(-5px);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: var(--background);
+            transform: translateY(-5px);
+        }
+
+        .copyright {
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                background: rgba(28, 37, 38, 0.95);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 70%;
+                transform: translateX(100%);
+                transition: var(--transition);
+                backdrop-filter: blur(10px);
+                z-index: 999;
+            }
+            
+            .nav-links.active {
+                transform: translateX(0);
+            }
+            
+            .hamburger {
+                display: block;
+                z-index: 1000;
+            }
+            
+            .hamburger.active .line1 {
+                transform: rotate(-45deg) translate(-5px, 6px);
+            }
+            
+            .hamburger.active .line2 {
+                opacity: 0;
+            }
+            
+            .hamburger.active .line3 {
+                transform: rotate(45deg) translate(-5px, -6px);
+            }
+            
+            .hero h1 {
+                font-size: 2.3rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .section-title {
+                font-size: 2.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="vanta-canvas"></div>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                گجت امنیتی
+            </div>
+            <ul class="nav-links">
+                <li><a href="#products"><i class="fas fa-box"></i> محصولات</a></li>
+                <li><a href="#about"><i class="fas fa-info-circle"></i> درباره ما</a></li>
+                <li><a href="#contact"><i class="fas fa-phone"></i> تماس</a></li>
+            </ul>
+            <div class="hamburger">
+                <div class="line1"></div>
+                <div class="line2"></div>
+                <div class="line3"></div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content floating">
+            <h1>امنیت را لمس کنید</h1>
+            <p>با گجت‌های پیشرفته و هوشمند، آرامش و اطمینان را به خانه و محل کار خود بیاورید</p>
+            <a href="#products" class="btn">کشف محصولات <i class="fas fa-arrow-down"></i></a>
+        </div>
+    </section>
+
+    <section id="products" class="section">
+        <h2 class="section-title">محصولات ما</h2>
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="image-container">
+                    <img src="https://i.postimg.cc/4dwS558R/IMG-4026.jpg" alt="RFLOCK" loading="lazy">
+                </div>
+                <h3>قفل هوشمند RFLOCK</h3>
+                <p>قفل الکترونیکی با قابلیت کنترل از راه دور و تشخیص چهره، مناسب برای درب‌های ورودی</p>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+                <a href="product1.html" class="btn">اطلاعات بیشتر</a>
+            </div>
+            <div class="product-card">
+                <div class="image-container">
+                    <img src="https://i.postimg.cc/RVrXryjV/IMG-4027.jpg" alt="دوربین نظارتی" loading="lazy">
+                </div>
+                <h3>دوربین نظارتی 360 درجه</h3>
+                <p>دوربین هوشمند با دید در شب، تشخیص حرکت و قابلیت چرخش 360 درجه</p>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+                <a href="product2.html" class="btn">اطلاعات بیشتر</a>
+            </div>
+            <div class="product-card">
+                <div class="image-container">
+                    <img src="https://i.postimg.cc/sf8D39c2/IMG-20250527-003229-744.jpg" alt="سیستم هشدار" loading="lazy">
+                </div>
+                <h3>سیستم هشدار پیشرفته</h3>
+                <p>سیستم امنیتی چند لایه با سنسورهای حساس و اتصال به اپلیکیشن موبایل</p>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <a href="product3.html" class="btn">اطلاعات بیشتر</a>
+            </div>
+            <div class="product-card">
+                <div class="image-container">
+                    <img src="https://i.postimg.cc/zfgXbLGr/IMG-20250527-004038-766.jpg" alt="دستگاه کنترل دسترسی" loading="lazy">
+                </div>
+                <h3>دستگاه کنترل دسترسی</h3>
+                <p>سیستم کنترل تردد با کارت و اثر انگشت برای سازمان‌ها و ساختمان‌های اداری</p>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+                <a href="product4.html" class="btn">اطلاعات بیشتر</a>
+            </div>
+            <div class="product-card">
+                <div class="image-container">
+                    <img src="https://source.unsplash.com/random/600x400/?security,device" alt="گجت امنیتی هوشمند" loading="lazy">
+                </div>
+                <h3>گجت امنیتی هوشمند</h3>
+                <p>دستگاه چندکاره امنیتی با قابلیت‌های پیشرفته نظارتی و کنترلی</p>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+                <a href="product5.html" class="btn">اطلاعات بیشتر</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="section" style="background: rgba(0,0,0,0.4);">
+        <h2 class="section-title">درباره ما</h2>
+        <div class="about-content">
+            <p class="about-text">
+                ما در گجت امنیتی با بیش از ۱۰ سال تجربه در حوزه امنیت دیجیتال و فیزیکی، با ارائه گجت‌های مدرن و هوشمند، 
+                تلاش می‌کنیم تا آرامش و اطمینان خاطر را برای خانه‌ها و محل‌های کار شما فراهم کنیم. 
+                تیم متخصص ما همواره در تلاش است تا با بهره‌گیری از آخرین فناوری‌های روز دنیا، 
+                محصولاتی با کیفیت و کارایی بالا ارائه دهد.
+            </p>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <i class="fas fa-medal"></i>
+                    <h4>کیفیت عالی</h4>
+                    <p>استانداردهای کیفیت بین‌المللی در تمام محصولات</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-headset"></i>
+                    <h4>پشتیبانی 24/7</h4>
+                    <p>پشتیبانی فنی شبانه‌روزی در 7 روز هفته</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>ضمانت محصول</h4>
+                    <p>گارانتی 2 ساله برای تمامی محصولات</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="section">
+        <h2 class="section-title">تماس با ما</h2>
+        <div class="contact-content">
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <h4>آدرس</h4>
+                        <p>تهران، خیابان آزادی، پلاک ۱۲۳</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <div>
+                        <h4>تلفن</h4>
+                        <p>۰۲۱-۱۲۳۴۵۶۷۸</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <div>
+                        <h4>ایمیل</h4>
+                        <p>info@securitygadget.com</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <h4>ساعات کاری</h4>
+                        <p>شنبه تا چهارشنبه: ۸:۰۰ - ۱۷:۰۰</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="contact-form">
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">نام کامل</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">ایمیل</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">شماره تماس</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">پیام شما</label>
+                        <textarea id="message" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">ارسال پیام <i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>درباره ما</h3>
+                <p>گجت امنیتی ارائه‌دهنده راهکارهای نوین امنیتی برای خانه و محل کار شما با بیش از ۱۰ سال سابقه درخشان</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h3>لینک‌های مفید</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> صفحه اصلی</a></li>
+                    <li><a href="#products"><i class="fas fa-chevron-left"></i> محصولات</a></li>
+                    <li><a href="#about"><i class="fas fa-chevron-left"></i> درباره ما</a></li>
+                    <li><a href="#contact"><i class="fas fa-chevron-left"></i> تماس با ما</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>محصولات پرفروش</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> قفل هوشمند RFLOCK</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> دوربین نظارتی 360 درجه</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> سیستم هشدار پیشرفته</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> دستگاه کنترل دسترسی</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>© 2025 گجت امنیتی. تمام حقوق محفوظ است. طراحی شده با <i class="fas fa-heart" style="color: #e74c3c;"></i> برای امنیت شما</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Vanta.js background
+        VANTA.NET({
+            el: "#vanta-canvas",
+            color: 0x00e676,
+            backgroundColor: 0x121212,
+            points: 12,
+            maxDistance: 22,
+            spacing: 18
+        });
+
+        // Hamburger menu toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        });
+        
+        // Close menu when clicking on links
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                hamburger.classList.remove('active');
+            });
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Form submission
+        const contactForm = document.getElementById('contactForm');
+        
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Form validation
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const message = document.getElementById('message').value;
+            
+            if (name && email && phone && message) {
+                // Show success message
+                alert('پیام شما با موفقیت ارسال شد! به زودی با شما تماس خواهیم گرفت.');
+                
+                // Reset form
+                contactForm.reset();
+            } else {
+                alert('لطفاً تمام فیلدهای ضروری را پر کنید.');
+            }
+        });
+        
+        // Add animation to elements when scrolling
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.product-card, .feature-card');
+            
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+                
+                if (elementPosition < screenPosition) {
+                    element.style.opacity = 1;
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        };
+        
+        // Set initial state for animated elements
+        document.querySelectorAll('.product-card, .feature-card').forEach(el => {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(50px)';
+            el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        });
+        
+        // Add scroll event listener
+        window.addEventListener('scroll', animateOnScroll);
+        // Trigger once on load
+        animateOnScroll();
+    </script>
+</body>
+</html>

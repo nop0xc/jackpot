@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قفل هوشمند RFLOCK | گجت امنیتی</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        :root {
+            --primary: #00e676;
+            --primary-dark: #00c853;
+            --secondary: #1e1e1e;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --text: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --accent: #4caf50;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: rgba(28, 37, 38, 0.9);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        .nav-links li a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            font-weight: 500;
+            position: relative;
+            padding: 8px 0;
+        }
+
+        .nav-links li a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links li a:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background-color: var(--text);
+            margin: 5px;
+            transition: var(--transition);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 20px 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            margin: 0 10px;
+        }
+
+        /* Product Section */
+        .product-section {
+            padding: 50px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+        }
+
+        .product-gallery {
+            position: relative;
+        }
+
+        .main-image {
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-bg);
+        }
+
+        .main-image img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            transition: var(--transition);
+        }
+
+        .thumbnails {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: var(--transition);
+            background: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .thumbnail:hover, .thumbnail.active {
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .thumbnail img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+        }
+
+        .product-info {
+            position: relative;
+        }
+
+        .product-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .product-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .product-description {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .quantity {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            border-radius: 50px;
+            padding: 5px 15px;
+        }
+
+        .quantity button {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .quantity button:hover {
+            color: var(--primary);
+        }
+
+        .quantity input {
+            width: 50px;
+            text-align: center;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--background);
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            position: relative;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 230, 118, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 230, 118, 0.6);
+        }
+
+        .btn-outline {
+            background: none;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--background);
+        }
+
+        .product-meta {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .meta-item {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .meta-item i {
+            width: 30px;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        /* Specifications */
+        .specs-section {
+            padding: 70px 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: var(--primary);
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .spec-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            transition: var(--transition);
+        }
+
+        .spec-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .spec-card h3 i {
+            font-size: 1.3rem;
+        }
+
+        .spec-list {
+            list-style: none;
+        }
+
+        .spec-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .spec-list li:last-child {
+            border-bottom: none;
+        }
+
+        .spec-name {
+            color: var(--text-secondary);
+        }
+
+        .spec-value {
+            font-weight: 500;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 70px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 230, 118, 0.2);
+        }
+
+        .feature-card i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover i {
+            transform: scale(1.2);
+        }
+
+        .feature-card h4 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .product-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-gallery {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                background: rgba(28, 37, 38, 0.95);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 70%;
+                transform: translateX(100%);
+                transition: var(--transition);
+                backdrop-filter: blur(10px);
+                z-index: 999;
+            }
+            
+            .nav-links.active {
+                transform: translateX(0);
+            }
+            
+            .hamburger {
+                display: block;
+                z-index: 1000;
+            }
+            
+            .hamburger.active .line1 {
+                transform: rotate(-45deg) translate(-5px, 6px);
+            }
+            
+            .hamburger.active .line2 {
+                opacity: 0;
+            }
+            
+            .hamburger.active .line3 {
+                transform: rotate(45deg) translate(-5px, -6px);
+            }
+            
+            .product-title {
+                font-size: 2rem;
+            }
+            
+            .product-price {
+                font-size: 1.8rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .thumbnails {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    گجت امنیتی
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#"><i class="fas fa-home"></i> خانه</a></li>
+                    <li><a href="#"><i class="fas fa-box"></i> محصولات</a></li>
+                    <li><a href="#"><i class="fas fa-info-circle"></i> درباره ما</a></li>
+                    <li><a href="#"><i class="fas fa-phone"></i> تماس</a></li>
+                </ul>
+                <div class="hamburger">
+                    <div class="line1"></div>
+                    <div class="line2"></div>
+                    <div class="line3"></div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">خانه</a>
+            <span>/</span>
+            <a href="#">محصولات</a>
+            <span>/</span>
+            <span>قفل هوشمند RFLOCK</span>
+        </div>
+    </div>
+
+    <section class="product-section container">
+        <div class="product-gallery">
+            <div class="main-image">
+                <img src="https://i.postimg.cc/4dwS558R/IMG-4026.jpg" alt="قفل هوشمند RFLOCK" id="mainImage">
+            </div>
+            <div class="thumbnails">
+                <div class="thumbnail active" data-image="https://i.postimg.cc/4dwS558R/IMG-4026.jpg">
+                    <img src="https://i.postimg.cc/4dwS558R/IMG-4026.jpg" alt="تصویر 1">
+                </div>
+                <div class="thumbnail" data-image="https://i.postimg.cc/RVrXryjV/IMG-4027.jpg">
+                    <img src="https://i.postimg.cc/RVrXryjV/IMG-4027.jpg" alt="تصویر 2">
+                </div>
+                <div class="thumbnail" data-image="https://i.postimg.cc/sf8D39c2/IMG-20250527-003229-744.jpg">
+                    <img src="https://i.postimg.cc/sf8D39c2/IMG-20250527-003229-744.jpg" alt="تصویر 3">
+                </div>
+                <div class="thumbnail" data-image="https://i.postimg.cc/zfgXbLGr/IMG-20250527-004038-766.jpg">
+                    <img src="https://i.postimg.cc/zfgXbLGr/IMG-20250527-004038-766.jpg" alt="تصویر 4">
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-info">
+            <h1 class="product-title">قفل هوشمند RFLOCK</h1>
+            <div class="product-price">۴,۹۹۰,۰۰۰ تومان</div>
+            <p class="product-description">
+                قفل هوشمند RFLOCK با طراحی مدرن و فناوری پیشرفته، امنیت و راحتی را برای منزل یا محل کار شما به ارمغان می‌آورد. 
+                این قفل با قابلیت‌های متنوعی همچون باز کردن با اثر انگشت، رمز عبور، کارت RFID و اپلیکیشن موبایل، 
+                تجربه‌ای بی‌نظیر از امنیت هوشمند را ارائه می‌دهد.
+            </p>
+            
+            <div class="product-actions">
+                <div class="quantity">
+                    <button class="decrement">-</button>
+                    <input type="number" value="1" min="1" id="quantity">
+                    <button class="increment">+</button>
+                </div>
+                <button class="btn"><i class="fas fa-shopping-cart"></i> افزودن به سبد خرید</button>
+                <button class="btn btn-outline"><i class="fas fa-heart"></i> افزودن به علاقه‌مندی‌ها</button>
+            </div>
+            
+            <div class="product-meta">
+                <div class="meta-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>گارانتی ۲۴ ماهه گجت امنیتی</div>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-truck"></i>
+                    <div>ارسال رایگان برای خریدهای بالای ۵ میلیون تومان</div>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>ضمانت بازگشت وجه در صورت عدم رضایت</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="specs-section">
+        <div class="container">
+            <h2 class="section-title">مشخصات فنی</h2>
+            <div class="specs-grid">
+                <div class="spec-card">
+                    <h3><i class="fas fa-microchip"></i> مشخصات اصلی</h3>
+                    <ul class="spec-list">
+                        <li>
+                            <span class="spec-name">نوع قفل</span>
+                            <span class="spec-value">هوشمند بیومتریک</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">روش‌های باز کردن</span>
+                            <span class="spec-value">اثر انگشت، رمز، کارت، اپلیکیشن</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">تعداد اثر انگشت</span>
+                            <span class="spec-value">۱۰۰ اثر</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">تعداد رمز عبور</span>
+                            <span class="spec-value">۲۰ رمز</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">تعداد کارت</span>
+                            <span class="spec-value">۲۰ کارت</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="spec-card">
+                    <h3><i class="fas fa-wifi"></i> قابلیت‌های اتصال</h3>
+                    <ul class="spec-list">
+                        <li>
+                            <span class="spec-name">اتصال Wi-Fi</span>
+                            <span class="spec-value">دارد</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">اتصال بلوتوث</span>
+                            <span class="spec-value">دارد (Bluetooth 5.0)</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">پشتیبانی از پلتفرم‌ها</span>
+                            <span class="spec-value">iOS, Android</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">نرم‌افزار مدیریت</span>
+                            <span class="spec-value">SecurityHome Pro</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="spec-card">
+                    <h3><i class="fas fa-battery-full"></i> مشخصات فیزیکی</h3>
+                    <ul class="spec-list">
+                        <li>
+                            <span class="spec-name">جنس بدنه</span>
+                            <span class="spec-value">آلیاژ روی ضد زنگ</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">رنگ‌بندی</span>
+                            <span class="spec-value">مشکی، نقره‌ای، طلایی</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">منبع تغذیه</span>
+                            <span class="spec-value">باتری لیتیوم 5000mAh</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">طول عمر باتری</span>
+                            <span class="spec-value">۱۲ ماه (با استفاده متوسط)</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">وزن</span>
+                            <span class="spec-value">۱.۲ کیلوگرم</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="spec-card">
+                    <h3><i class="fas fa-shield-alt"></i> امنیت و استانداردها</h3>
+                    <ul class="spec-list">
+                        <li>
+                            <span class="spec-name">سطح امنیتی</span>
+                            <span class="spec-value">IP65 (مقاوم در برابر آب و گرد و غبار)</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">استاندارد رمزنگاری</span>
+                            <span class="spec-value">AES-256</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">سیستم هشدار</span>
+                            <span class="spec-value">هشدار صوتی و ارسال نوتیفیکیشن</span>
+                        </li>
+                        <li>
+                            <span class="spec-name">ضد دستکاری</span>
+                            <span class="spec-value">سیستم آلارم در صورت دستکاری فیزیکی</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section container">
+        <h2 class="section-title">ویژگی‌های منحصر به فرد</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-fingerprint"></i>
+                <h4>باز کردن با اثر انگشت</h4>
+                <p>دسترسی سریع و امن با اسکنر اثر انگشت پیشرفته</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-mobile-alt"></i>
+                <h4>کنترل از راه دور</h4>
+                <p>مدیریت کامل از طریق اپلیکیشن موبایل</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-history"></i>
+                <h4>لاگ دسترسی</h4>
+                <p>ثبت تمامی ورود و خروج‌ها با تاریخ و ساعت دقیق</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-bell"></i>
+                <h4>هشدار امنیتی</h4>
+                <p>اعلان فوری در صورت تلاش برای دسترسی غیرمجاز</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-user-friends"></i>
+                <h4>مدیریت چند کاربری</h4>
+                <p>امکان تعریف کاربران مختلف با سطح دسترسی متفاوت</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h4>پشتیبان‌گیری باتری</h4>
+                <p>کارکرد با پورت USB در صورت اتمام باتری</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Particle background
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const numParticles = 80;
+        const maxDistance = 100;
+        const mouse = { x: null, y: null, radius: 150 };
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = `rgba(0, 230, 118, ${Math.random() * 0.5 + 0.1})`;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < mouse.radius) {
+                    const force = (mouse.radius - distance) / mouse.radius;
+                    this.x -= (dx / distance) * force * 5;
+                    this.y -= (dy / distance) * force * 5;
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function connect() {
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a + 1; b < particles.length; b++) {
+                    const dx = particles[a].x - particles[b].x;
+                    const dy = particles[a].y - particles[b].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < maxDistance) {
+                        ctx.strokeStyle = `rgba(0, 230, 118, ${1 - distance / maxDistance})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            connect();
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        // Hamburger menu toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        });
+        
+        // Close menu when clicking on links
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                hamburger.classList.remove('active');
+            });
+        });
+        
+        // Image gallery
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const mainImage = document.getElementById('mainImage');
+        
+        thumbnails.forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                // Remove active class from all thumbnails
+                thumbnails.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked thumbnail
+                thumb.classList.add('active');
+                
+                // Change main image
+                const newImageSrc = thumb.getAttribute('data-image');
+                mainImage.src = newImageSrc;
+                
+                // Add animation effect
+                mainImage.style.opacity = 0;
+                setTimeout(() => {
+                    mainImage.style.opacity = 1;
+                }, 300);
+            });
+        });
+        
+        // Quantity control
+        const quantityInput = document.getElementById('quantity');
+        const decrementBtn = document.querySelector('.decrement');
+        const incrementBtn = document.querySelector('.increment');
+        
+        decrementBtn.addEventListener('click', () => {
+            let value = parseInt(quantityInput.value);
+            if (value > 1) {
+                quantityInput.value = value - 1;
+            }
+        });
+        
+        incrementBtn.addEventListener('click', () => {
+            let value = parseInt(quantityInput.value);
+            quantityInput.value = value + 1;
+        });
+        
+        // Form submission
+        const addToCartBtn = document.querySelector('.btn.fa-shopping-cart').parentElement;
+        
+        addToCartBtn.addEventListener('click', () => {
+            const quantity = parseInt(quantityInput.value);
+            alert(`${quantity} عدد قفل هوشمند RFLOCK به سبد خرید افزوده شد!`);
+        });
+    </script>
+</body>
+</html>
